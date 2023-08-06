@@ -1,0 +1,67 @@
+   .data
+grade_A_msg: .asciz "Congratulations! You got an A."
+grade_B_msg: .asciz "Good job! You got a B."
+grade_C_msg: .asciz "Not bad, you got a C."
+grade_F_msg: .asciz "Sorry, you got an F."
+
+    .text
+    .global main
+    
+main:
+    @ Prompt user to enter the percentage grade
+    ldr r0, =prompt_msg        @ Load the address of the prompt message
+    bl printf                  @ Print the prompt message
+    
+    @ Read the percentage grade from the user
+    ldr r0, =input_format      @ Load the address of the input format
+    ldr r1, =grade             @ Load the address of the grade variable
+    bl scanf                   @ Read the user input
+    
+    @ Compare the grade with the cutoffs using constants
+    ldr r2, =grade_A_cutoff    @ Load the address of the A cutoff
+    ldr r3, =grade_B_cutoff    @ Load the address of the B cutoff
+    ldr r4, =grade_C_cutoff    @ Load the address of the C cutoff
+    ldr r5, =grade             @ Load the address of the grade variable
+    ldr r5, [r5]               @ Load the value of the grade variable
+    
+    cmp r5, r2                 @ Compare grade >= A cutoff
+    bge grade_A                @ Branch if grade >= A cutoff
+    
+    cmp r5, r3                 @ Compare grade >= B cutoff
+    bge grade_B                @ Branch if grade >= B cutoff
+    
+    cmp r5, r4                 @ Compare grade >= C cutoff
+    bge grade_C                @ Branch if grade >= C cutoff
+    
+    b grade_F                  @ Branch to grade_F
+    
+grade_A:
+    ldr r0, =grade_A_msg       @ Print 'Congratulations! You got an A.'
+    bl printf
+    b end
+
+grade_B:
+    ldr r0, =grade_B_msg       @ Print 'Good job! You got a B.'
+    bl printf
+    b end
+
+grade_C:
+    ldr r0, =grade_C_msg       @ Print 'Not bad, you got a C.'
+    bl printf
+    b end
+
+grade_F:
+    ldr r0, =grade_F_msg       @ Print 'Sorry, you got an F.'
+    bl printf
+    
+end:
+    mov r7, #1                 @ Exit the program
+    swi 0
+    
+    .data
+prompt_msg: .asciz "Please enter your percentage grade: "
+input_format: .asciz "%d"
+grade: .word 0
+grade_A_cutoff: .word 90
+grade_B_cutoff: .word 75
+grade_C_cutoff: .word 50
